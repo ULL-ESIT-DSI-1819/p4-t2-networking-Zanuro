@@ -1,0 +1,23 @@
+{
+  "name": "CHAPTER3-SOCKETS",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ULL-ESIT-DSI-1819/p4-t2-networking-Zanuro.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ULL-ESIT-DSI-1819/p4-t2-networking-Zanuro/issues"
+  },
+  "homepage": "https://github.com/ULL-ESIT-DSI-1819/p4-t2-networking-Zanuro#readme"
+}

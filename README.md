@@ -172,4 +172,152 @@ Por lo tanto se podria dar el caso siguiente:
 {"type":"changed", time  |  stamp":1551459934090}\n
 donde se ha puesto el | para delimitar el posible mensaje en dos mensajes que llegaran como distintos eventos de tipo data.
 
-Vamos a implementar un programa que recibe un mensaje como este y comprobaremos como responde el cliente.
+Vamos a implementar un programa que recibe un mensaje como este y comprobaremos como responde el cliente.El servicio que quieremos implementar puede separar mensajes en varios chunks.
+
+(captura)
+
+Este servidor difiere en unos cuantos sentidos del servidor previamente creado.Una de las diferencias seria que no estamos siguiendo a ningun fichero esperando a que cambie para parsear la entrada y mandarle un mensaje al usuario de que el fichero ha cambiado.En este ejemplo lo unico que hacemos es mandar un primer chunk del mensaje al cliente, tras establecer la conexion y despues de cierto tiempo enviamos el segundo chunk esperando un cierto tiempo antes de enviar el chunk.
+
+Finalmente cuando se haya terminado la conexion se hace un clearTimeout del tiempo del timer que hemos establecido para esperar antes de mandar el chunk y por lo tanto esto hara que surgan errores en cuanto se llame a connection.write().
+
+(captura)
+
+En este ejemplo vemos como corremos el servidor, y al conectarse el cliente nos dice Subscriber connected.El cliente al conectarse se le respondera con undefined:1 y luego el primer chunk.Luego surge el error the unexpected end of JSON input,que el mensaje que se ha recibido no es un mensaje valido de JSON.El cliente ha intentado mandar un mensaje a medias a JSON.parse() que solo coge mensajes completos y validos de tipo JSON.
+
+Lo siguiente que haremos es mejorar el cliente para que pueda trabajar con mensajes a medias.Lo que haremos es que el programa guarde los data que reciben en mensajes y que pueda manejar cualquier mensaje en cuanto llegue.
+Vamos a crear un modulo que maneja los chunks que le llegan para que en un final el programa principal solo reciba mensajes completos.
+
+Primero vemos un ejemplo de herencia en Node.
+
+```javascript
+
+const EventEmitter = require ('events').EventEmitter;
+class LDJClient extends EventEmitter {
+    constructor(stream){
+        super();
+    }
+}
+
+```
+LDJClient es una clase que hereda de EventEmitter, lo que significa que es necesario llamar a  new LDJClient(stream) para obtener una instancia de este.El parametro stream se utiliza para emitir ciertos eventos de tipo data.Dentro del constructor llamamos a super() para invocar al constructor propio de EventEmitter.Cada vez que implementamos una clase que extiende otra clase necesitamos llamar a super().
+JS hace uso de prototypal inheritance para establecer la relacion entre LDJClient y EventEmitter.
+
+```javascript
+const client = new LDJClient(networkStream);
+client.on('message', message =>{
+    // take action
+});
+```
+Para utilizar el LDJClient.
+
+Este codigo funciona, sin embargo no hemos implementado un programa que guarde los data events en Node.
+
+Para intentar guardar los eventos de data en el buffer utilizaremos el parametro stream en LDJClient para manejarnos con el buffer.El objetivo es coger data sin parsear del stream y convertirla en eventos de mensajes conteniendo los objetos de mensajes parseados.
+
+(captura)
+
+```
+En este trozo de codigo lo que hacemos es coger los chunks que le llegan y los mete en un buffer y va buscando algunos \n que significarian el fin del mensaje.
+Primero en el constructor del stream lo que hacemos es llamar a super y luego crear un buffer en el que iremos guardando los chunk que nos llegan.A continuacion lo que haremos es llamar al stream para manejar los eventos de tipo data.En este manejador lo que haremos es coger los chunks de data y meterlos en el buffer y luego iremos buscando desde principio el signo que va a delimitar los mensajes, el \n, y cogiendo el index.Luego mientras que el index sea diferente de 0,cogemos lo que hay hasta el delimitador y luego deja en el buffer lo que se encuentra a partir del delimitador.Lo que cogemos como input lo metemos para parsearslo tal como hemos hecho anteriormente con JSON.parse() y lo enviamos.
+De esta manera nos aseguramos de que si el mensaje llega dividido en 5 trozos o en un unico trozo, podemos saber con certeza de que lo vera como un mensaje entero y no dara problemas al parsearlo.
+Para esto lo que haremos es meterlo dentro de un modulo Node.js para que pueda ser utilizado por nuestro cliente.
+```
+
+Antes de proseguir vamos a hablar un poco de como hubiese sido hacer el codigo de la clase LDJClient sin hacer uso de constructor() o super(), o class().
+
+```javascript
+const EventEmitter = require('events').EventEmitter;
+const util = require('util');
+
+function LDJClient(stream){
+    EventEmitter.call(this);
+}
+util.inherits(LDJClient, EventEmitter);
+```
+
+```
+En este codigo utilizaremos la funcion de LDJClient que actuara tal como actuaba la clase LDJClient y el constructor en el codigo anterior.Y en vez de hacer uso de super invocamos al EventEmitter con this.Luego hacemos uso de util.inherits para hacer el LDJClient objeto padre del prototipado el prototipado del EventEmitter.Basicamente lo que hacemos es decirle que si se esta buscando una propiedad en LDJClient y no lo encuentra que la vaya buscando en EventEmitter.
+Si por ejemplo creamos una instancia cliente de la clase LDJClient y luego lo llamamos con el metodo on, como no existe este metodo dentro de las funcionalidades de esta clase, estara buscando el metodo on en la clase EventEmitter y si por ejemplo tampoco lo encuentra en la clase EventEmitter lo estara buscando en la clase Object y ira asi buscando en los padres hasta que lo encuentre.
+```
+
+(captura)
+
+Este codigo es una combinacion de los fragmentos anteriores de codigos de LDJClient mas un metodo estatico del final-connect- que se encuentra directamente definido en la clase LDJClient y se ha definido meramente para que los usuarios no tengan que utilizar el new cada vez que quieren crear una instancia de LDJClient.El module.exports = LDJClient lo utilizaremos para exportar nuestra clase como un modulo y para que la gente lo pueda exportar como un modulo.
+
+Para utilizar el modulo haremos lo siguiente:
+
+```javascript
+const LDJClient = require('../lib/ldj-client2.js');
+const client = new LDJClient(networkStream);
+```
+
+O directamente haciendo uso del connect sin que tengamos que poner el new:
+
+```javascript
+const client = require('../lib/ldj-client2.js').connect(networkStream);
+```
+
+En los dos casos se utiliza la ruta relativa para obtener el codigo del modulo ya que no es un modulo oficial,subido a npm como es el caso de fs.
+
+Vamos a proceder a extender el codigo del cliente para que pueda usar el modulo.
+
+(captura)
+Este codigo es similar al codigo anteriormente creado en net-watcher-json-client.js, la unica diferencia siendo que en vez de pasar los trozos de datos que les llegan directamente al parseador asi obteniendo el mensaje, ahora el programa se basa en el modulo creado LDJClient para que le de datos sobre el tipo de mensaje.
+
+Para verlo en funcionamiento primero ejecutariamos el servicio,el servidor y luego en otra terminal el cliente que hemos hecho anteriormente en otra terminal.Con esto nos aseguramos de que el cliente se puede comunicar con el servidor de una manera segura.
+(captura)
+
+De esta manera el servidor aunque tenga los trozos de mensajes de tipo JSON separados por un \n, nustro nuevo modulo es capaz de entender estas divisiones y juntar el codigo para que al usuario se le transforme este objeto JSON a un mensaje que se pueda leer.
+
+## Mocha
+Lo siguiente que veremos es como desarrollar tests unitarios con Mocha.Es un framework de testeo, multiparadigma bastante utilizado.Primero instalamos Mocha con npm,y luego desarrollaremos una unidad de testeo para LDJClient.
+Como npm se suele guiar por un fichero de configuracion,vamos a crear el fichero package.json de configuracion.
+Para esto ejecutamos:
+```javascript
+npm init -y
+```
+Con esto inicializaremos el fichero de configuracion por defecto y con la opcion -y le decimos de que ponga todas las opciones las por defecto a yes.
+El fichero resultante:
+(captura)
+
+Luego instalamos Mocha:
+```javascript
+npm install --save-dev --save-exact mocha@3.4.2
+```
+Al hacer esto instalamos Mocha y podemos ver que se nos crea un directorio llamado node_modules que contendra Mocha y sus dependencias ya que se ha instalado Mocha localmente en el directorio que estamos utilizando y no globalmente a nivel de maquina.
+Tambien se debe actualizar el package.json para que incluya las devdependencies que sera las dependencias instaladas con sus versiones.En nuestro caso:
+
+```javascript
+"devDependencies":{
+    "mocha": "3.4.2"
+}
+```
+En Node hay dos tipos de dependencias:dependencias regulares que se usan en el momento de ejecucion al hacer uso del require() para cargar los modulos y las dependencias de dev,que tu proyecto utiliza durante el desarrollo y para esto se utiliza save-dev para guardarlo como una devDependencies.
+Ambos tipos de dependencias se instalan con el comando: npm install.
+Si se quiere instalar solo las dependencias regulares utilizaremos: npm install --production, o modificando la variable de entorno NODE_ENV a production.
+npm tambien crea un package-lock.json que contendra las versiones de todos los modulos de los que depende Mocha.
+(captura package lock)
+
+-Las versiones semanticas de los paquetes
+
+Al utilizar la opcion --save-exact al instalar un modulo le decimos a npm que instale una version concreta pero por defecto npm utiliza semantic versioning para encontrar la mejor version disponible del modulo.La version semantica es un concepto muy importante que se representa con un numero de version dividido en tres partes: la primera es la version-major,la segunda es la version-minor,y la tercera es la version-patch.Estan separadas por un ".".
+
+```
+La version patch se ira modificando cada vez que se modifica el codigo pero no se anade ninguna nueva(o no se quita) funcionalidad.
+La version minor se ira modificando cada vez que se modifica el codigo y se introducen nuevas funcionalidades pero no se quitan o modifican las funcionalidades existentes.Al incrementarse tambien se resetea el patch.
+La version major se ira modificando cada vez que se modifica el codigo y cambian las funcionalidades existentes.Tambien se resetean el minor y el patch.
+```
+
+Podemos obviar poner el save-exact o el numero de version si se quiere instalar la ultima version disponible.
+
+```
+Si se obvia la opcion save-exact al instalar el modulo con npm se anadira al package-json la version con un "^".Es decir si se quiere instalar la version 1.2.3 de un modulo si no se le especifica el save-exact se guardara como "^1.2.3" lo que significa que utilizara la version minor existente mayor o igual que la especificada.
+Es decir si sale otra version mejorando el minor a : 1.4.0 y alguien quiere descargar un modulo que tiene como dependencia el "^1.2.3" se le descargara automaticamente el 1.4.0.Esto solo funciona para las versiones minor.
+Otro ejemplo en el que se podria estar mas estricto seria fijar la version a ~1.2.3 y si sale un patch de 1.2.4 los usuarios descargaran la nueva 1.2.4 pero no podran obtener la nueva version minor por ejemplo la 1.3.0
+De esta manera haciendo uso de la ~, como lo unico que se acepta es un cambio de patch,se supone que en los patch solo se deben introducir cambios que no modificaran las funcionalidades existentes del codigo.
+```
+Aunque la comunidad suele seguir esta version semantica no siempre es asi y es recomendable hacer uso del --save-exact para obtener la version que nosostros quieramos al instalar paquetes y tendremos que especificar y actualizar las dependencias que nos haran falta para un modulo que quieramos pero al menos no corremos el riesgo de instalar un modulo que no siga esta version semantica.
+
+Tambien podemos meter el package-lock.json al control de versiones, para que luego podamos utilizar npm outdated que nos mostrara los modulos de los cuales dependemos que tengan versiones mejoradas.Al instalar la ultima version tambien se actualizara en el package-lock.json.
+
+-Tests con Mocha
