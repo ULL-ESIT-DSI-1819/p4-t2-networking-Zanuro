@@ -283,6 +283,7 @@ El fichero resultante:
 Luego instalamos Mocha:
 ```javascript
 npm install --save-dev --save-exact mocha@3.4.2
+
 ```
 Al hacer esto instalamos Mocha y podemos ver que se nos crea un directorio llamado node_modules que contendra Mocha y sus dependencias ya que se ha instalado Mocha localmente en el directorio que estamos utilizando y no globalmente a nivel de maquina.
 Tambien se debe actualizar el package.json para que incluya las devdependencies que sera las dependencias instaladas con sus versiones.En nuestro caso:
@@ -303,9 +304,9 @@ npm tambien crea un package-lock.json que contendra las versiones de todos los m
 Al utilizar la opcion --save-exact al instalar un modulo le decimos a npm que instale una version concreta pero por defecto npm utiliza semantic versioning para encontrar la mejor version disponible del modulo.La version semantica es un concepto muy importante que se representa con un numero de version dividido en tres partes: la primera es la version-major,la segunda es la version-minor,y la tercera es la version-patch.Estan separadas por un ".".
 
 ```
-La version patch se ira modificando cada vez que se modifica el codigo pero no se anade ninguna nueva(o no se quita) funcionalidad.
-La version minor se ira modificando cada vez que se modifica el codigo y se introducen nuevas funcionalidades pero no se quitan o modifican las funcionalidades existentes.Al incrementarse tambien se resetea el patch.
-La version major se ira modificando cada vez que se modifica el codigo y cambian las funcionalidades existentes.Tambien se resetean el minor y el patch.
+La version PATCH se ira modificando cada vez que se modifica el codigo pero no se anade ninguna nueva(o no se quita) funcionalidad.
+La version MINOR se ira modificando cada vez que se modifica el codigo y se introducen nuevas funcionalidades pero no se quitan o modifican las funcionalidades existentes.Al incrementarse tambien se resetea el patch.
+La version MAJOR se ira modificando cada vez que se modifica el codigo y cambian las funcionalidades existentes.Tambien se resetean el minor y el patch.
 ```
 
 Podemos obviar poner el save-exact o el numero de version si se quiere instalar la ultima version disponible.
@@ -321,3 +322,80 @@ Aunque la comunidad suele seguir esta version semantica no siempre es asi y es r
 Tambien podemos meter el package-lock.json al control de versiones, para que luego podamos utilizar npm outdated que nos mostrara los modulos de los cuales dependemos que tengan versiones mejoradas.Al instalar la ultima version tambien se actualizara en el package-lock.json.
 
 -Tests con Mocha
+Para desarrollar los tests vamos a crear una carpeta test, que es la carpeta por defecto que Mocha mira por los tests.
+Para esto anadimos el siguiente test:
+(Captura)
+
+```
+En este codigo lo primero que hacemos es 'importar' los modulos que necesitamos:el modulo assert para la comparacion de valores, event para los data event que vamos a manejar y nuestro modulo creado LDJClient.
+Luego creamos a traves del metodo propio de Mocha-describe unos test-LDJClient, y tiene una callback con los datos de ese test.
+Se declara una variable para la instancia que vamos a utilizar de la clase LDJClient-client y otra variable para la instancia de la clase EventEmitter-stream y luego para cada uno de las variables se le asigna una nueva instancia de la clase respectiva.
+Finalmente se llama al metodo it para testear un comportamiento especifico de la clase.Ponemos un manejador de eventos de tipo mensajes en el cliente, y con el metodo deepEqual() comprobamos que lo que se ha recibido coincide con lo que quieramos.Finalmente se llama al metodo done() para avisar cuando el test haya terminado.Luego le decimos a nuestro stream que emita los datos.
+```
+
+Para correr el test primero necesitamos anadir al package.json lo siguiente:
+```javascript
+"scripts": {
+    "test": "mocha"
+  },
+```
+Las entradas de scripts siendo comandos que se pueden invocar desde la linea de comandos a traves del npm run.En nuestro caso si ejecutamos:
+```javascript
+npm run test
+```
+Correra mocha.(Y tambien se puede omitir el run y ejecutar directamente: $ npm test)
+
+En ejecucion:
+(captura)
+
+Ahora procederemos a mejorar el test-json-service.js para que sea un test de verdad.
+
+Para esto primero modificamos el ldj-client-test.js de la siguiente manera(en el metodo describe):
+```javascript
+it('should emit a message event from split data events', done => {
+    client.on('message', message => {
+        assert.deepEqual(message, {foo: 'bar'});
+        done();
+    });
+    stream.emit('data', '{"foo":')});
+    process.nextTick(() => stream.emit('data', '"bar"}\n'));
+});
+```
+
+El test lo que hace es dividir el mensaje en dos partes para que pueda ser emitido por el stream uno despues de otro.En el process.nextTick lo que hacemos es poner que el codigo del callback se ejecute tan pronto como termina el codigo actual en ejecutarse.Es decir tan pronto como de ejecutarse los procesos en el event loop,en la siguiente iteracion se decide emitir el siguiente trozo de datos.Este process.nextTick() es similar al otro metodo de javascript llamado setTimeout(callback,tiempo(ms)), es que el process tick ejecutara el callback en la siguiente iteracion del bucle de eventos mientras que el setTimeout(callback,tiempo) esperara a que se acabe el event loop y todos los callback que estaban en la cola que se ejecuten para luego ejecutar la callback(o un cierto codigo) que se le pasa como primer argumento despues de un cierto perido de ms especificado como segundo argumento.
+Podriamos utilizar cualquiera de los dos metodos para enviar un trozo de datos despues de otro mientras que el tiempo de espera que le ponemos sea menor que el timeout de Mocha.(por defecto el tiempo de timeout es de 2000ms)
+
+Podemos modificar el timeout para los tests con la opcion --timeout n` ms. Si ponemos 0 ms significa que lo quieremos desactivar.
+Si quieremos un tiempo determinado para un test concreto puedes hacer lo siguiente:
+
+```javascript
+it('should finish within 5 seconds', done => {
+    setTimeout(done,4500);
+}).timeout(5000);
+```
+En este caso llamamos el timeout directamente al objeto retornado por el metodo it.
+Tambien se puede llamar el timeout para una serie de tests del describe.
+
+
+--Resumiendo
+
+En este capitulo hemos visto aplicaciones de red con sockets en Node.js.Hemos desarrollado una comunicacion cliente-servidor y un protocolo JSON para que se puedan comunicar.
+Al ver los problemas que han surgido al hacer uso del protocolo y que el mensaje transmitido puede o no llegar del todo en el mismo momento han surgido problemas que hemos resuelto creando un modulo de la clase LDJClient extendiendo la clase de EventEmitter.
+Tambien se ha visto Mocha y se ha usado para desarrollar tests y como se maneja todo el tema de la semantic versioning y por que es util/
+
+
+--Testability
+   Hemos desarrollado un test para la clase LDJClient,emitiendo un mensaje que ha llegado como un unico evento de datos.Surgen las siguientes preguntas
+
+   --Add a unit test for a single message that is split over two(or more) data events from the stream.
+   --Add a unit test that passes in null to the LDJClient constructor and asserts that an error is thrown.Then make the test pass by modifying the constructor to accept null: the semantic being that the created stream behaves as /dev/null in Unix.
+
+--Robustness
+    Extender la clase LDJClient.
+
+    --The LDJClient already handles the case in which a properly formatted JSON string is split over multiply lines. What happen if the incoming data is not a properly formatted JSON string?
+    --Write a test case that sends a data event that is not JSON. What do you think on how to manage this case?
+    --What happens if the last data event completes a a JSON message, but without the trailing new line?
+    --Write a case where the stream object sends a data event containing JSON but no newline, followed by a close event. How will you manage this case?
+    --Should LDJClient emit a close event for its listeners?
+
