@@ -432,3 +432,13 @@ Tambien se ha visto Mocha y se ha usado para desarrollar tests y como se maneja 
 
 Tambien se ha anadido tareas para facilitar la ejecucion de ciertos programas.
 (captura)
+
+#Travis 
+Tambien se ha utilizado Travis para integracion continua utilizado para construir y testear proyectos que se encuentran alojados en Github.
+Para esto es necesario incluir un fichero .travis.yml en el que incluimos el lenguage que se utiliza principalmente en el proyecto(en nuestro caso node.js) y la version que se va a utilizar para testear el codigo escrito en node.js.Una vez que tengamos linkeado Travis con nuestro proyecto en github, Travis detectara automaticamente cada vez que se hace un nuevo commit(y si tenemos el .travis.yml en el repo) y cada vez que ocurre esto, Travis intentara "construir" el proyecto y probara a hacer distintos tests para el proyecto.Tambien es necesario que hagamos el repositorio publico para que Travis funcione.
+Travis es bastante util ya que podemos comprobar si nuestros tests han resultado exitosos y en caso de que no, Travis nos dira.
+(captura)
+
+Badge:
+Travis status: [![Build Status](https://travis-ci.org/ULL-ESIT-DSI-1819/p4-t2-networking-Zanuro.png)](https://travis-ci.org/ULL-ESIT-DSI-1819/p4-t2-networking-Zanuro)
+
