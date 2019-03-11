@@ -141,13 +141,13 @@ En ejecucion:
 
 
 Lo siguiente que haremos es implementar el cliente que recibira los mensajes de tipo JSON del servidor.
-(captura)
+![ccap1](https://user-images.githubusercontent.com/25621400/54158889-84061700-4443-11e9-9587-150eed12ee8f.png)
 
 Este programa crea una conexion del cliente al localhost a traves del puerto 60300 y esperara a que le lleguen datos.
 En cuanto lleguen los datos se parsean a traves de JSON.parse y en funcion del atributo type de message imprimira un mensaje u otro.Si el type es watching imprimira por console el Now watching con llamando al atributo file de message para obtener el nombre del fichero.En caso de que el tipo sea changed parseara el valor del timestamp del mensaje a una fecha y la imprimira por consola.En otro caso, ocurre un tipo no esperado e imprimira por consola el tipo de mensaje.
 
 En ejecucion:
-(captura)
+![cap9](https://user-images.githubusercontent.com/25621400/54158116-b6167980-4441-11e9-8bea-ce4e715b888d.png)
 
 Al conectarnos con el cliente al servidor y modificar el fichero nos dira cuando el fichero ha cambiado.
 Sin embargo este programa no esta del todo completo ya que solo escucha cuando haya eventos que implica datos,en otro caso(de terminacion de la conexion-end o en caso de que surga algun error-error event) no toma ninguna accion pero tambien hay otros problemas en este codigo que veremos a continuacion.
@@ -183,13 +183,13 @@ donde se ha puesto el | para delimitar el posible mensaje en dos mensajes que ll
 
 Vamos a implementar un programa que recibe un mensaje como este y comprobaremos como responde el cliente.El servicio que quieremos implementar puede separar mensajes en varios chunks.
 
-(captura)
+![cap11](https://user-images.githubusercontent.com/25621400/54158121-b878d380-4441-11e9-8ef2-16aa24bc3163.png)
 
 Este servidor difiere en unos cuantos sentidos del servidor previamente creado.Una de las diferencias seria que no estamos siguiendo a ningun fichero esperando a que cambie para parsear la entrada y mandarle un mensaje al usuario de que el fichero ha cambiado.En este ejemplo lo unico que hacemos es mandar un primer chunk del mensaje al cliente, tras establecer la conexion y despues de cierto tiempo enviamos el segundo chunk esperando un cierto tiempo antes de enviar el chunk.
 
 Finalmente cuando se haya terminado la conexion se hace un clearTimeout del tiempo del timer que hemos establecido para esperar antes de mandar el chunk y por lo tanto esto hara que surgan errores en cuanto se llame a connection.write().
 
-(captura)
+![cap10](https://user-images.githubusercontent.com/25621400/54158117-b747a680-4441-11e9-85a0-e32f020e8914.png)
 
 En este ejemplo vemos como corremos el servidor, y al conectarse el cliente nos dice Subscriber connected.El cliente al conectarse se le respondera con undefined:1 y luego el primer chunk.Luego surge el error the unexpected end of JSON input,que el mensaje que se ha recibido no es un mensaje valido de JSON.El cliente ha intentado mandar un mensaje a medias a JSON.parse() que solo coge mensajes completos y validos de tipo JSON.
 
@@ -223,7 +223,7 @@ Este codigo funciona, sin embargo no hemos implementado un programa que guarde l
 
 Para intentar guardar los eventos de data en el buffer utilizaremos el parametro stream en LDJClient para manejarnos con el buffer.El objetivo es coger data sin parsear del stream y convertirla en eventos de mensajes conteniendo los objetos de mensajes parseados.
 
-(captura)
+![ccap2](https://user-images.githubusercontent.com/25621400/54159443-e57ab580-4444-11e9-8c6a-7460d180295c.png)
 
 ```
 En este trozo de codigo lo que hacemos es coger los chunks que le llegan y los mete en un buffer y va buscando algunos \n que significarian el fin del mensaje.
@@ -249,7 +249,7 @@ En este codigo utilizaremos la funcion de LDJClient que actuara tal como actuaba
 Si por ejemplo creamos una instancia cliente de la clase LDJClient y luego lo llamamos con el metodo on, como no existe este metodo dentro de las funcionalidades de esta clase, estara buscando el metodo on en la clase EventEmitter y si por ejemplo tampoco lo encuentra en la clase EventEmitter lo estara buscando en la clase Object y ira asi buscando en los padres hasta que lo encuentre.
 ```
 
-(captura)
+![cap20](https://user-images.githubusercontent.com/25621400/54158123-b9aa0080-4441-11e9-96ea-29fdd9278f19.png)
 
 Este codigo es una combinacion de los fragmentos anteriores de codigos de LDJClient mas un metodo estatico del final-connect- que se encuentra directamente definido en la clase LDJClient y se ha definido meramente para que los usuarios no tengan que utilizar el new cada vez que quieren crear una instancia de LDJClient.El module.exports = LDJClient lo utilizaremos para exportar nuestra clase como un modulo y para que la gente lo pueda exportar como un modulo.
 
@@ -270,11 +270,13 @@ En los dos casos se utiliza la ruta relativa para obtener el codigo del modulo y
 
 Vamos a proceder a extender el codigo del cliente para que pueda usar el modulo.
 
-(captura)
+![cap21](https://user-images.githubusercontent.com/25621400/54158125-bb73c400-4441-11e9-8c2b-0382130d6359.png)
+
 Este codigo es similar al codigo anteriormente creado en net-watcher-json-client.js, la unica diferencia siendo que en vez de pasar los trozos de datos que les llegan directamente al parseador asi obteniendo el mensaje, ahora el programa se basa en el modulo creado LDJClient para que le de datos sobre el tipo de mensaje.
 
 Para verlo en funcionamiento primero ejecutariamos el servicio,el servidor y luego en otra terminal el cliente que hemos hecho anteriormente en otra terminal.Con esto nos aseguramos de que el cliente se puede comunicar con el servidor de una manera segura.
-(captura)
+
+![cap25](https://user-images.githubusercontent.com/25621400/54158138-c3336880-4441-11e9-903d-470bcb157b00.png)
 
 De esta manera el servidor aunque tenga los trozos de mensajes de tipo JSON separados por un \n, nustro nuevo modulo es capaz de entender estas divisiones y juntar el codigo para que al usuario se le transforme este objeto JSON a un mensaje que se pueda leer.
 
@@ -287,9 +289,11 @@ npm init -y
 ```
 Con esto inicializaremos el fichero de configuracion por defecto y con la opcion -y le decimos de que ponga todas las opciones las por defecto a yes.
 El fichero resultante:
-(captura)
+
+![cap26](https://user-images.githubusercontent.com/25621400/54158142-c4649580-4441-11e9-99c8-19f38da4abf2.png)
 
 Luego instalamos Mocha:
+
 ```javascript
 npm install --save-dev --save-exact mocha@3.4.2
 
@@ -306,9 +310,11 @@ En Node hay dos tipos de dependencias:dependencias regulares que se usan en el m
 Ambos tipos de dependencias se instalan con el comando: npm install.
 Si se quiere instalar solo las dependencias regulares utilizaremos: npm install --production, o modificando la variable de entorno NODE_ENV a production.
 npm tambien crea un package-lock.json que contendra las versiones de todos los modulos de los que depende Mocha.
-(captura package lock)
 
--Las versiones semanticas de los paquetes
+![ccap3](https://user-images.githubusercontent.com/25621400/54159761-abf67a00-4445-11e9-830d-7021506e0de2.png)
+Esto es solo una parte del package.json.
+
+-Las versiones semanticas de los paquetes:
 
 Al utilizar la opcion --save-exact al instalar un modulo le decimos a npm que instale una version concreta pero por defecto npm utiliza semantic versioning para encontrar la mejor version disponible del modulo.La version semantica es un concepto muy importante que se representa con un numero de version dividido en tres partes: la primera es la version-major,la segunda es la version-minor,y la tercera es la version-patch.Estan separadas por un ".".
 
@@ -333,7 +339,8 @@ Tambien podemos meter el package-lock.json al control de versiones, para que lue
 -Tests con Mocha
 Para desarrollar los tests vamos a crear una carpeta test, que es la carpeta por defecto que Mocha mira por los tests.
 Para esto anadimos el siguiente test:
-(Captura)
+
+![cap27](https://user-images.githubusercontent.com/25621400/54158143-c4fd2c00-4441-11e9-9a03-e96b6cb9e982.png)
 
 ```
 En este codigo lo primero que hacemos es 'importar' los modulos que necesitamos:el modulo assert para la comparacion de valores, event para los data event que vamos a manejar y nuestro modulo creado LDJClient.
@@ -355,7 +362,8 @@ npm run test
 Correra mocha.(Y tambien se puede omitir el run y ejecutar directamente: $ npm test)
 
 En ejecucion:
-(captura)
+
+![cap30](https://user-images.githubusercontent.com/25621400/54158147-c6c6ef80-4441-11e9-99bf-238f3ce389a6.png)
 
 Ahora procederemos a mejorar el test-json-service.js para que sea un test de verdad.
 
@@ -394,57 +402,104 @@ Tambien se ha visto Mocha y se ha usado para desarrollar tests y como se maneja 
 
 
 # Testability
-   -Hemos desarrollado un test para la clase LDJClient,emitiendo un mensaje que ha llegado como un unico evento de datos.Surgen las siguientes preguntas
+
+ Hemos desarrollado un test para la clase LDJClient,emitiendo un mensaje que ha llegado como un unico evento de datos.Surgen las siguientes preguntas
 
    1.Add a unit test for a single message that is split over two(or more) data events from the stream.
-
-    En este caso anadimos la prueba que anade el salto de linea al stream que se usa como delimitador de los eventos de datos.
-    (captura)
+   
+   En este caso anadimos la prueba que anade el salto de linea al stream que se usa como delimitador de los eventos dedatos.
+    
+   ![cap40](https://user-images.githubusercontent.com/25621400/54158148-c890b300-4441-11e9-9d83-cb58405c166c.png)
+   
+   En ejecucion:
+   
+   ![cap41](https://user-images.githubusercontent.com/25621400/54158152-c9294980-4441-11e9-9c3b-3a9579f15420.png)
     
    2.Add a unit test that passes in null to the LDJClient constructor and asserts that an error is thrown.Then make the test pass by modifying the constructor to accept null: the semantic being that the created stream behaves as /dev/null in Unix.
 
-    Primero creamos la prueba en nuestro describe LDJClient y salta con un assert si al constructor se le ha pasado null.Modificaremos nuestro LDJClient para que el constructor acepte null.En caso de que el constructor reciba null lanzara un error.
-    (captura)
-
+   Primero creamos la prueba en nuestro describe LDJClient y salta con un assert si al constructor se le ha pasado null.Modificaremos nuestro LDJClient para que el constructor acepte null.En caso de que el constructor reciba null lanzara un error.
+   
+   ![cap42](https://user-images.githubusercontent.com/25621400/54158154-ca5a7680-4441-11e9-9559-85739fbd5ae6.png)
+   
+   Modificamos la clase LDJClient para que acepte null:
+   
+   ![ccap4](https://user-images.githubusercontent.com/25621400/54160177-c5e48c80-4446-11e9-888f-10f27f49e87a.png)
+   
+   Test:
+   ![cap43](https://user-images.githubusercontent.com/25621400/54158159-cb8ba380-4441-11e9-8889-e6e260f87d77.png)
+   
+   
 # Robustness
-    Extender la clase LDJClient.
+   Extender la clase LDJClient.
 
-    1.The LDJClient already handles the case in which a properly formatted JSON string is split over multiply lines. What happen if the incoming data is not a properly formatted JSON string?
+   1.The LDJClient already handles the case in which a properly formatted JSON string is split over multiply lines. What happen if the incoming data is not a properly formatted JSON string?
 
-    Si el mensaje que vendria no estaria formadeado como una cadena de tipo JSON, el JSON.parse no seria capaz de construir el objeto de tipo JSON desde la cadena lo cual implicaria un fallo, pero si por ejemplo se le pasaria una cadena en formato '" mensaje "\n', el JSON lo parsearia de manera que devolveria el objeto que contenga el
-    " mensaje " , lo cual implicaria que el JSON lo leeria tal cual y lo devolveria igual al no tratarse de un objeto tipo JSON, pero como se le ha enganado poniendo la combinacion de '" "', creeria al principio de que es uno tipo JSON pero no es asi.Cabe destacar que es esencial poner el '\n' es lo unico por el que se esta guiando el programa para separar los mensajes.
-    (captura)
+   Si el mensaje que vendria no estaria formadeado como una cadena de tipo JSON, el JSON.parse no seria capaz de construir el objeto de tipo JSON desde la cadena lo cual implicaria un fallo, pero si por ejemplo se le pasaria una cadena en formato '" mensaje "\n', el JSON lo parsearia de manera que devolveria el objeto que contenga el " mensaje " , lo cual implicaria que el JSON lo leeria tal cual y lo devolveria igual al no tratarse de un objeto tipo JSON, pero como se le ha enganado poniendo la combinacion de '" "', creeria al principio de que es uno tipo JSON pero no es asi.Cabe destacar que es esencial poner el '\n' es lo unico por el que se esta guiando el programa para separar los mensajes.
+   
+ ![cap45](https://user-images.githubusercontent.com/25621400/54158160-ccbcd080-4441-11e9-9d9c-b0eb2719020e.png)
+ 
+ Los tests:
+ 
+ ![ccap5](https://user-images.githubusercontent.com/25621400/54160411-5b801c00-4447-11e9-9432-f7355c79a475.png)
 
-    2.Write a test case that sends a data event that is not JSON. What do you think on how to manage this case?
+ 2.Write a test case that sends a data event that is not JSON. What do you think on how to manage this case?
 
-    Anadiremos una prueba que emita un stream de datos que no se trata de un mensaje tipo JSON correctamente formateado.En la clase LDJClient anadiremos un bloque try-catch que emita el mensaje parseandolo como un mensaje tipo JSON correcto y en caso de que coga un error lanze un error de que el mensaje emitido no es un mensaje tipo JSON.
-    (captura)
+ Anadiremos una prueba que emita un stream de datos que no se trata de un mensaje tipo JSON correctamente formateado.En la clase LDJClient anadiremos un bloque try-catch que emita el mensaje parseandolo como un mensaje tipo JSON correcto y en caso de que coga un error lanze un error de que el mensaje emitido no es un mensaje tipo JSON.
+ 
+![cap47](https://user-images.githubusercontent.com/25621400/54158166-cf1f2a80-4441-11e9-93aa-554ebee403d7.png)
 
-    3.What happens if the last data event completes a a JSON message, but without the trailing new line?
+Modificar la clase LDJClient para tratar los casos en caso de que coga un error lanza un como error un mensaje:
 
-    Saltaria un error ya que el stream de data estara siempre buscando el indice del '\n' mientras haya datos en el stream, y el limite que esta poniendo y por el cual se esta guiando es el indice en el que se halla el '\n', si no existe el '\n' no se podria delimitar el mensaje en caso de que venga en diferentes momentos y seria un problema.
-    (captura)
+![cap49](https://user-images.githubusercontent.com/25621400/54158168-d0e8ee00-4441-11e9-8bd7-f8f2e6c9c94b.png)
 
-    4.Write a case where the stream object sends a data event containing JSON but no newline, followed by a close event. How will you manage this case?
+Tests:
+
+![cap48](https://user-images.githubusercontent.com/25621400/54158167-cfb7c100-4441-11e9-86da-e4a96cf68497.png)
+
+ 3.What happens if the last data event completes a a JSON message, but without the trailing new line?
+
+ Saltaria un error ya que el stream de data estara siempre buscando el indice del '\n' mientras haya datos en el stream, y el limite que esta poniendo y por el cual se esta guiando es el indice en el que se halla el '\n', si no existe el '\n' no se podria delimitar el mensaje en caso de que venga en diferentes momentos y seria un problema.
+   
+   Prueba:
+   
+   ![cap50](https://user-images.githubusercontent.com/25621400/54158170-d1818480-4441-11e9-9ea7-dfc1b7009ddd.png)
+   
+   Test:
+   ![cap51](https://user-images.githubusercontent.com/25621400/54158174-d34b4800-4441-11e9-85ac-95f8cbadcf4b.png)
+
+ 4.Write a case where the stream object sends a data event containing JSON but no newline, followed by a close event. How will you manage this case?
     Creamos una nueva prueba que emita unos datos en formato tipo JSON con las "{" y "}" del comienzo y en final pero sin el delimitador que se estaba utilizado antes, es decir el "\n" y modificamos la clase LDJClient para que en caso de que el stream reciba un evento de tipo close, coga como delimitador el "}" que va a ser el ultimo caracter del mensaje, y lo parsee a formato JSON y lo manda.En caso de que si faltase del final el "}" entonces lanzaria un error de que le falta el "}" para finalizar.
-    (captura)
+    
+   Prueba:
+    
+  ![cap55](https://user-images.githubusercontent.com/25621400/54158180-d47c7500-4441-11e9-8522-268de3c36242.png)
+    
+  Extension de la clase LDJClient para anadir un stream en case de que el tipo de evento sea close:
+  
+  ![cap56](https://user-images.githubusercontent.com/25621400/54158182-d5150b80-4441-11e9-8caf-db952d8e29d6.png)
+  
+  Test:
+  
+  ![cap57](https://user-images.githubusercontent.com/25621400/54158183-d6463880-4441-11e9-9cda-254fdfe79c94.png)
 
-    5.Should LDJClient emit a close event for its listeners?
+  5.Should LDJClient emit a close event for its listeners?
 
-    No es estrictamente necesario que LDJClient emita un evento de cierre a los que estan escuchando si los listeners estan enviando datos, pero si lo podria hacer en caso de que no esten enviando datos.
-    Tambien se podria emitir cuando el listener haya avisado del cierre de la conexion.
+  No es estrictamente necesario que LDJClient emita un evento de cierre a los que estan escuchando si los listeners estan enviando datos, pero si lo podria hacer en caso de que no esten enviando datos.
+  Tambien se podria emitir cuando el listener haya avisado del cierre de la conexion.
 
 
 #Gulpfile
 
 Tambien se ha anadido tareas para facilitar la ejecucion de ciertos programas.
-(captura)
+
+![cap61](https://user-images.githubusercontent.com/25621400/54158185-d6decf00-4441-11e9-82c0-6b85dc6de718.png)
 
 #Travis 
 Tambien se ha utilizado Travis para integracion continua utilizado para construir y testear proyectos que se encuentran alojados en Github.
 Para esto es necesario incluir un fichero .travis.yml en el que incluimos el lenguage que se utiliza principalmente en el proyecto(en nuestro caso node.js) y la version que se va a utilizar para testear el codigo escrito en node.js.Una vez que tengamos linkeado Travis con nuestro proyecto en github, Travis detectara automaticamente cada vez que se hace un nuevo commit(y si tenemos el .travis.yml en el repo) y cada vez que ocurre esto, Travis intentara "construir" el proyecto y probara a hacer distintos tests para el proyecto.Tambien es necesario que hagamos el repositorio publico para que Travis funcione.
 Travis es bastante util ya que podemos comprobar si nuestros tests han resultado exitosos y en caso de que no, Travis nos dira.
-(captura)
+
+![ccap6](https://user-images.githubusercontent.com/25621400/54160767-52dc1580-4448-11e9-9494-ae341d4b007c.png)
 
 Badge:
 Travis status: [![Build Status](https://travis-ci.org/ULL-ESIT-DSI-1819/p4-t2-networking-Zanuro.png)](https://travis-ci.org/ULL-ESIT-DSI-1819/p4-t2-networking-Zanuro)
