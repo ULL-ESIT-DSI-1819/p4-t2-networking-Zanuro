@@ -426,3 +426,9 @@ Tambien se ha visto Mocha y se ha usado para desarrollar tests y como se maneja 
 
     No es estrictamente necesario que LDJClient emita un evento de cierre a los que estan escuchando si los listeners estan enviando datos, pero si lo podria hacer en caso de que no esten enviando datos.
     Tambien se podria emitir cuando el listener haya avisado del cierre de la conexion.
+
+
+#Gulpfile
+
+Tambien se ha anadido tareas para facilitar la ejecucion de ciertos programas.
+(captura)
