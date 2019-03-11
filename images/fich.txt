@@ -1,0 +1,1 @@
+En este directorio se guardaran las capturas hechas a lo largo del desarrollo de la practica.
