@@ -38,7 +38,7 @@ Lo siguiente que se hara es observar el fichero que se le esta pasando por linea
 Cuando se cierra la conexion establecida(el cliente se haya disconectado) imprimira por consola un mensaje y dejara de seguir el fichero.Por ultimo asignara un puerto de escucha al servidor para la conexion de posibles clientes.(en el puerto 60300)
 ```
 
-```
+
 Para que todo esto funcione vamos a necesitar una consola que actue como el servidor, una como el cliente y otra que haga los cambios en el fichero a seguir.
 Para esto ejecutaremos en la primera terminal:
 ``` watch -n 1 touch target.txt ```
@@ -102,6 +102,7 @@ Para codificar el primer tipo de mensaje utilizaremos la siguiente notacion:
 
 ```
 {"type:"watching","file":"target.txt"}
+```
 
 Donde el atributo type indicara que se trata de un mensaje de tipo watching mientras que el atributo file el fichero que se esta siguiendo.
 
@@ -170,6 +171,7 @@ Pero se podria dar el caso de que el mensaje sea partido por la mitad y que lleg
 Por lo tanto se podria dar el caso siguiente:
 ```
 {"type":"changed", time  |  stamp":1551459934090}\n
+```
 donde se ha puesto el | para delimitar el posible mensaje en dos mensajes que llegaran como distintos eventos de tipo data.
 
 Vamos a implementar un programa que recibe un mensaje como este y comprobaremos como responde el cliente.El servicio que quieremos implementar puede separar mensajes en varios chunks.
@@ -384,18 +386,43 @@ Al ver los problemas que han surgido al hacer uso del protocolo y que el mensaje
 Tambien se ha visto Mocha y se ha usado para desarrollar tests y como se maneja todo el tema de la semantic versioning y por que es util/
 
 
---Testability
-   Hemos desarrollado un test para la clase LDJClient,emitiendo un mensaje que ha llegado como un unico evento de datos.Surgen las siguientes preguntas
+# Testability
+   -Hemos desarrollado un test para la clase LDJClient,emitiendo un mensaje que ha llegado como un unico evento de datos.Surgen las siguientes preguntas
 
-   --Add a unit test for a single message that is split over two(or more) data events from the stream.
-   --Add a unit test that passes in null to the LDJClient constructor and asserts that an error is thrown.Then make the test pass by modifying the constructor to accept null: the semantic being that the created stream behaves as /dev/null in Unix.
+   1.Add a unit test for a single message that is split over two(or more) data events from the stream.
 
---Robustness
+    En este caso anadimos la prueba que anade el salto de linea al stream que se usa como delimitador de los eventos de datos.
+    (captura)
+    
+   2.Add a unit test that passes in null to the LDJClient constructor and asserts that an error is thrown.Then make the test pass by modifying the constructor to accept null: the semantic being that the created stream behaves as /dev/null in Unix.
+
+    Primero creamos la prueba en nuestro describe LDJClient y salta con un assert si al constructor se le ha pasado null.Modificaremos nuestro LDJClient para que el constructor acepte null.En caso de que el constructor reciba null lanzara un error.
+    (captura)
+
+# Robustness
     Extender la clase LDJClient.
 
-    --The LDJClient already handles the case in which a properly formatted JSON string is split over multiply lines. What happen if the incoming data is not a properly formatted JSON string?
-    --Write a test case that sends a data event that is not JSON. What do you think on how to manage this case?
-    --What happens if the last data event completes a a JSON message, but without the trailing new line?
-    --Write a case where the stream object sends a data event containing JSON but no newline, followed by a close event. How will you manage this case?
-    --Should LDJClient emit a close event for its listeners?
+    1.The LDJClient already handles the case in which a properly formatted JSON string is split over multiply lines. What happen if the incoming data is not a properly formatted JSON string?
 
+    Si el mensaje que vendria no estaria formadeado como una cadena de tipo JSON, el JSON.parse no seria capaz de construir el objeto de tipo JSON desde la cadena lo cual implicaria un fallo, pero si por ejemplo se le pasaria una cadena en formato '" mensaje "\n', el JSON lo parsearia de manera que devolveria el objeto que contenga el
+    " mensaje " , lo cual implicaria que el JSON lo leeria tal cual y lo devolveria igual al no tratarse de un objeto tipo JSON, pero como se le ha enganado poniendo la combinacion de '" "', creeria al principio de que es uno tipo JSON pero no es asi.Cabe destacar que es esencial poner el '\n' es lo unico por el que se esta guiando el programa para separar los mensajes.
+    (captura)
+
+    2.Write a test case that sends a data event that is not JSON. What do you think on how to manage this case?
+
+    Anadiremos una prueba que emita un stream de datos que no se trata de un mensaje tipo JSON correctamente formateado.En la clase LDJClient anadiremos un bloque try-catch que emita el mensaje parseandolo como un mensaje tipo JSON correcto y en caso de que coga un error lanze un error de que el mensaje emitido no es un mensaje tipo JSON.
+    (captura)
+
+    3.What happens if the last data event completes a a JSON message, but without the trailing new line?
+
+    Saltaria un error ya que el stream de data estara siempre buscando el indice del '\n' mientras haya datos en el stream, y el limite que esta poniendo y por el cual se esta guiando es el indice en el que se halla el '\n', si no existe el '\n' no se podria delimitar el mensaje en caso de que venga en diferentes momentos y seria un problema.
+    (captura)
+
+    4.Write a case where the stream object sends a data event containing JSON but no newline, followed by a close event. How will you manage this case?
+    Creamos una nueva prueba que emita unos datos en formato tipo JSON con las "{" y "}" del comienzo y en final pero sin el delimitador que se estaba utilizado antes, es decir el "\n" y modificamos la clase LDJClient para que en caso de que el stream reciba un evento de tipo close, coga como delimitador el "}" que va a ser el ultimo caracter del mensaje, y lo parsee a formato JSON y lo manda.En caso de que si faltase del final el "}" entonces lanzaria un error de que le falta el "}" para finalizar.
+    (captura)
+
+    5.Should LDJClient emit a close event for its listeners?
+
+    No es estrictamente necesario que LDJClient emita un evento de cierre a los que estan escuchando si los listeners estan enviando datos, pero si lo podria hacer en caso de que no esten enviando datos.
+    Tambien se podria emitir cuando el listener haya avisado del cierre de la conexion.
