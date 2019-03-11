@@ -17,6 +17,6 @@
   gulp.task("connection-unix", shell.task("node src/net-watcher-unix.js src/target.txt"));
   gulp.task("watch-repeatedly", shell.task("watch -n 1 touch src/target.txt"));
 
-
+  gulp.task("documentation", shell.task("documentation build lib/ldj-client2.js -f md > documentation.md"))
 
 
