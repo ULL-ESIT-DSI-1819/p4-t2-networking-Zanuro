@@ -50,28 +50,34 @@ En la tercera terminal actuaremos como cliente que se conectara al servidor por 
 Tambien se puede utilizar telnet en caso de que netcat no funcione.
 
 Una vez que pongamos todo esto en las terminales tal como se ha mencionado veremos lo siguiente:
-(captura)
+
+![cap3](https://user-images.githubusercontent.com/25621400/54158101-ae56d500-4441-11e9-9de1-39cc0a823dcf.png)
+
 En al consola de la izquiera se ejecuta el comando watch para modificar el fichero que se va a seguir cada cierto tiempo.En la del centro ejecutaremos el programa(servidor) que se pondra a escuchar por posibles conexiones y observar el fichero por posibles cambios.En la de la derecha se conectara el "cliente" al servidor por el puerto 60300 y el servidor le respondera en cuanto se produzcan cambios en el fichero.
 Para desconectarnos haremos uso de Ctrl+c.
 En caso de telnet ocurrira lo mismo pero para desconectarnos utilizaremos ctrl+j y quit y enter.
-(captura)
+
+
+![cap4](https://user-images.githubusercontent.com/25621400/54158102-af880200-4441-11e9-931e-fb41413c64c2.png)
 
 Por lo tanto el servidor asigna un puerto de escucha(60300) y estara escuchando a los posibles cambios en el fichero seguido.
 Podemos abrir varias terminales y conectarnos con varios clientes al puerto 60300 con netcat a traves del mismo puerto del servidor(60300).
 Todos los clientes conectados recibiran avisos cuando el fichero seguido se haya cambiado.
-(captura)
 
+![cap5](https://user-images.githubusercontent.com/25621400/54158105-b0b92f00-4441-11e9-87e1-ab93eac7c98e.png)
 
 Para la comunicacion entre procesos del mismo ordenador utilizaremos los sockets de Unix en vez de una conexion tcp.
 
 Para esto modificaremos el programa anteriormente creado(servidor) adaptado a que este usando sockets de Unix.
 A la funcion listen que anteriormente usabamos para conectarnos al puerto 60300, la modificaremos para que en vez de escuchar al puerto haga uso de /tmp/watcher.sock.
 
-(captura)
+![cap6](https://user-images.githubusercontent.com/25621400/54158107-b282f280-4441-11e9-8710-ea4ee4f1b3ed.png)
 
 Y luego lo ejecutaremos:
-(captura)
-Sin embargo tenemos el problema de que no existe el fichero watcher.sock(al menos en la maquina local) y el cliente no puede estabalecer la conexion con el servidor.
+
+![ccap60](https://user-images.githubusercontent.com/25621400/54158187-d80ffc00-4441-11e9-9f8b-cce6e755a42b.png)
+
+Sin embargo tenemos el problema de que no existe el fichero watcher.sock(al menos en la maquina local) y el cliente no puede estabalecer la conexion con el servidor.(Haria falta reiniciar la maquina para que funcione).
 Los sockets de Unix sin embargo pueden resultar mas rapidos que los sockets TCP ya que no requiren ningunas dependencias en cuanto al hardware de conexion,sino que son propios de la maquina.
 
 Lo siguiente que veremos va a ser como pasar los datos que se reciben en un formato aceptado.
@@ -127,10 +133,11 @@ connection.write(JSON.stringify({type: 'changed', timestamp: Date.now()}) + '\n'
 ```
 Esto le dira al usuario el fichero que se esta siguiendo y en caso de que cambie cuando se cambia.
 
-(captura)
+![cap7](https://user-images.githubusercontent.com/25621400/54158112-b44cb600-4441-11e9-8dd0-554a8fc52198.png)
 
 En ejecucion:
-(captura)
+
+![cap8](https://user-images.githubusercontent.com/25621400/54158113-b57de300-4441-11e9-86fe-35ce52bb04e0.png)
 
 
 Lo siguiente que haremos es implementar el cliente que recibira los mensajes de tipo JSON del servidor.
