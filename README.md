@@ -1,6 +1,8 @@
 # Practica 4 - Sockets
 
 
+Travis status: [![Build Status](https://travis-ci.org/ULL-ESIT-DSI-1819/p4-t2-networking-Zanuro.png)](https://travis-ci.org/ULL-ESIT-DSI-1819/p4-t2-networking-Zanuro)
+
 
 En esta practica aprenderemos sobre las conexiones de tipo socket propias de Node.Desarrollaremos los dos puntos de conexion tanto para el servidor como para el cliente, y veremos el protocolo JSON utilizado para la comunicacion cliente/servidor.Tambien se veran cosas sobre la herencia en JavaScript y como relacionar los objetos entre si.
 Tambien haremos integracion con testeo haciendo uso de Mocha.
@@ -528,7 +530,4 @@ Para esto es necesario incluir un fichero .travis.yml en el que incluimos el len
 Travis es bastante util ya que podemos comprobar si nuestros tests han resultado exitosos y en caso de que no, Travis nos dira.
 
 ![ccap6](https://user-images.githubusercontent.com/25621400/54160767-52dc1580-4448-11e9-9494-ae341d4b007c.png)
-
-Badge:
-Travis status: [![Build Status](https://travis-ci.org/ULL-ESIT-DSI-1819/p4-t2-networking-Zanuro.png)](https://travis-ci.org/ULL-ESIT-DSI-1819/p4-t2-networking-Zanuro)
 
