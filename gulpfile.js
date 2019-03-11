@@ -10,17 +10,13 @@
   gulp.task("documentacion", shell.task("docco lib/ldj-client2.js"));
   gulp.task("custom-client", shell.task("node src/net-watcher-json-client.js"));
   gulp.task("custom-test-service", shell.task("node src/test-json-service.js"));
-  gulp.task("json-service", shell.task("node src/net-watcher-json-service.js target.txt"));
+  gulp.task("json-service", shell.task("node src/net-watcher-json-service.js src/target.txt"));
   gulp.task("connect-nc", shell.task("nc localhost 60300"));
   gulp.task("connect-telnet", shell.task("telnet localhost 60300"));
   gulp.task("connect-socket", shell.task("nc -U /tmp/watcher.sock"));
-  gulp.task("connection-unix", shell.task("node net-watcher-unix.js target.txt"));
-  gulp.task("watch-repeatedly", shell.task("watch -n 1 touch target.txt"));
+  gulp.task("connection-unix", shell.task("node src/net-watcher-unix.js src/target.txt"));
+  gulp.task("watch-repeatedly", shell.task("watch -n 1 touch src/target.txt"));
 
 
-
-
-
-  
 
 

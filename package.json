@@ -21,6 +21,8 @@
   },
   "homepage": "https://github.com/ULL-ESIT-DSI-1819/p4-t2-networking-Zanuro#readme",
   "devDependencies": {
+    "gulp": "^4.0.0",
+    "gulp-shell": "^0.7.0",
     "mocha": "3.4.2"
   }
 }
