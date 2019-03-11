@@ -452,6 +452,7 @@ Tambien se ha visto Mocha y se ha usado para desarrollar tests y como se maneja 
    ![ccap4](https://user-images.githubusercontent.com/25621400/54160177-c5e48c80-4446-11e9-888f-10f27f49e87a.png)
    
    Test:
+   
    ![cap43](https://user-images.githubusercontent.com/25621400/54158159-cb8ba380-4441-11e9-8889-e6e260f87d77.png)
    
    
@@ -491,6 +492,7 @@ Tests:
    ![cap50](https://user-images.githubusercontent.com/25621400/54158170-d1818480-4441-11e9-9ea7-dfc1b7009ddd.png)
    
    Test:
+   
    ![cap51](https://user-images.githubusercontent.com/25621400/54158174-d34b4800-4441-11e9-85ac-95f8cbadcf4b.png)
 
  4.Write a case where the stream object sends a data event containing JSON but no newline, followed by a close event. How will you manage this case?
