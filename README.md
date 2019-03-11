@@ -524,6 +524,10 @@ Tambien se ha anadido tareas para facilitar la ejecucion de ciertos programas.
 
 ![cap61](https://user-images.githubusercontent.com/25621400/54158185-d6decf00-4441-11e9-82c0-6b85dc6de718.png)
 
+Alguna prueba:
+
+![ccap10](https://user-images.githubusercontent.com/25621400/54162854-fcbea080-444e-11e9-927f-2fbf68512522.png)
+
 # Travis 
 
 Tambien se ha utilizado Travis para integracion continua utilizado para construir y testear proyectos que se encuentran alojados en Github.
@@ -532,3 +536,6 @@ Travis es bastante util ya que podemos comprobar si nuestros tests han resultado
 
 ![ccap6](https://user-images.githubusercontent.com/25621400/54160767-52dc1580-4448-11e9-9494-ae341d4b007c.png)
 
+![ccap11](https://user-images.githubusercontent.com/25621400/54162856-fdefcd80-444e-11e9-8a5f-89717d51dc2f.png)
+
+Tambien se puede observar el badge que nos dice de que la integracion continua con Travis ha resultado exitosa
