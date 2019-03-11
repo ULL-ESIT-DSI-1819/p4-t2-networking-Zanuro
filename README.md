@@ -534,7 +534,7 @@ Tambien se ha utilizado Travis para integracion continua utilizado para construi
 Para esto es necesario incluir un fichero .travis.yml en el que incluimos el lenguage que se utiliza principalmente en el proyecto(en nuestro caso node.js) y la version que se va a utilizar para testear el codigo escrito en node.js.Una vez que tengamos linkeado Travis con nuestro proyecto en github, Travis detectara automaticamente cada vez que se hace un nuevo commit(y si tenemos el .travis.yml en el repo) y cada vez que ocurre esto, Travis intentara "construir" el proyecto y probara a hacer distintos tests para el proyecto.Tambien es necesario que hagamos el repositorio publico para que Travis funcione.
 Travis es bastante util ya que podemos comprobar si nuestros tests han resultado exitosos y en caso de que no, Travis nos dira.
 
-![ccap6](https://user-images.githubusercontent.com/25621400/54160767-52dc1580-4448-11e9-9494-ae341d4b007c.png)
+![ccap12](https://user-images.githubusercontent.com/25621400/54164550-f7fceb00-4454-11e9-9d5e-b9b4ae4540b7.png)
 
 ![ccap11](https://user-images.githubusercontent.com/25621400/54162856-fdefcd80-444e-11e9-8a5f-89717d51dc2f.png)
 
