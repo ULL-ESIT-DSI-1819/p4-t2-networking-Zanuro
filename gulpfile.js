@@ -18,5 +18,6 @@
   gulp.task("watch-repeatedly", shell.task("watch -n 1 touch src/target.txt"));
 
   gulp.task("documentation", shell.task("documentation build lib/ldj-client2.js -f md > documentation.md"))
+  gulp.task("documentation-1", shell.task("documentation build src/net-watcher-json-client.js -f md > documentation1.md"))
 
 
