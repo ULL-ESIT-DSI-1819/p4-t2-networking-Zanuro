@@ -539,3 +539,14 @@ Travis es bastante util ya que podemos comprobar si nuestros tests han resultado
 ![ccap11](https://user-images.githubusercontent.com/25621400/54162856-fdefcd80-444e-11e9-8a5f-89717d51dc2f.png)
 
 Tambien se puede observar el badge que nos dice de que la integracion continua con Travis ha resultado exitosa
+
+# Reto
+El reto propuesto fue crear un chat multiusuario.Es decir creamos un servidor donde los diferentes usuarios sean capaces de conectarse con netcat a un puerto definido y comunicarse entre ellos.
+El codigo es el siguiente:
+
+![ccap20](https://user-images.githubusercontent.com/25621400/54275226-00067900-4582-11e9-9aac-ae3b018a7d1a.png)
+
+Esto es una ejecucion y el funcionamiento propio del chat:
+
+![ccap21](https://user-images.githubusercontent.com/25621400/54275228-0137a600-4582-11e9-84db-378a33a2858a.png)
+
