@@ -544,9 +544,9 @@ Tambien se puede observar el badge que nos dice de que la integracion continua c
 El reto propuesto fue crear un chat multiusuario.Es decir creamos un servidor donde los diferentes usuarios sean capaces de conectarse con netcat a un puerto definido y comunicarse entre ellos.
 El codigo es el siguiente:
 
-![ccap20](https://user-images.githubusercontent.com/25621400/54275226-00067900-4582-11e9-9aac-ae3b018a7d1a.png)
+![ccap21](https://user-images.githubusercontent.com/25621400/54275228-0137a600-4582-11e9-84db-378a33a2858a.png)
 
 Esto es una ejecucion y el funcionamiento propio del chat:
 
-![ccap21](https://user-images.githubusercontent.com/25621400/54275228-0137a600-4582-11e9-84db-378a33a2858a.png)
+![ccap20](https://user-images.githubusercontent.com/25621400/54275226-00067900-4582-11e9-9aac-ae3b018a7d1a.png)
 
